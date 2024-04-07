@@ -1,6 +1,5 @@
-# Passito
-Hostel gatepass management system.
-
+# Slim Starter
+A PHP template framework that hooks slim and other packages.
 
 ## Dependencies
 - Sass
