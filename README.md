@@ -11,6 +11,16 @@ A PHP template framework that hooks slim and other packages.
 
 ## Get Started
 
+Install Composer Dependencies
+```bash
+composer install
+```
+
+Install NPM Dependencies
+```bash
+npm install
+```
+
 Run Development Server to Serve Static Files
 ```bash
 npm run dev
