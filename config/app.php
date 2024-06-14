@@ -14,6 +14,7 @@ return [
     'app' => [
         'name' => $_ENV['APP_NAME'],
         'desc' => $_ENV['APP_DESC'],
+        'environment' => $_ENV['APP_ENV'] ?? 'dev',
         'host' => $_ENV['APP_URL'] ?? 'http://localhost',
         'version' => $_ENV['APP_VERSION'] ?? '1.0',
         'display_error_details' => $boolean($_ENV['APP_DEBUG'] ?? 0),

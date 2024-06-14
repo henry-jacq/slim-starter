@@ -80,3 +80,28 @@ function hashtag(string $text)
     $filteredText = preg_replace('/#(\w+)/', '<a href="/discover/tags/$1">#$1</a>', $text);
     return $filteredText;
 }
+
+function isDevMode() {
+    if (strtolower($_ENV['APP_ENV']) == 'dev') {
+        return true;
+    }
+    return false;
+}
+
+function get_app_css() {
+    $asset = "resources/css/app.css";
+    $manifestPath = PUBLIC_PATH . '/build/.vite/manifest.json';
+    if (!file_exists($manifestPath)) {
+        // Handle case where manifest does not exist (e.g., in development)
+        return $asset;
+    }
+
+    $manifest = json_decode(file_get_contents($manifestPath), true);
+    if (isset($manifest[$asset])) {
+        return '/build/' . $manifest[$asset]['file'];
+    }
+
+    // Handle case where the asset is not found in the manifest
+    return $asset;
+}
+

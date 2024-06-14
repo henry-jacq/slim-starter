@@ -1,19 +1,18 @@
 {
-  "dependencies": {
-    "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.3",
-    "grunt": "^1.6.1",
-    "grunt-cli": "^1.4.3",
-    "jquery": "^3.7.1",
-    "sass": "^1.72.0"
+  "name": "slim-starter",
+  "version": "1.0.0",
+  "description": "A PHP template framework that hooks slim and other packages.",
+  "scripts": {
+    "dev": "npx vite --host",
+    "build": "npx vite build"
   },
-  "devDependencies": {
-    "grunt-contrib-concat": "^2.1.0",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-cssmin": "^5.0.0",
-    "grunt-contrib-obfuscator": "^8.0.0",
-    "grunt-contrib-sass": "^2.0.0",
-    "grunt-contrib-uglify": "^5.2.2",
-    "grunt-contrib-watch": "^1.1.0"
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "vite": "^5.3.1"
   }
 }
