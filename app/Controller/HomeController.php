@@ -20,15 +20,7 @@ class HomeController extends Controller
         $args = [
             'title' => 'Home'
         ];
-        return $this->render($request, $response, 'user/home', $args, footer: true);
-    }
-
-    public function request(Request $request, Response $response): Response
-    {
-        $args = [
-            'title' => 'Request'
-        ];
-        return $this->render($request, $response, 'user/request', $args, footer: true);
+        return $this->render($request, $response, 'home', $args);
     }
 
 }

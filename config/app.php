@@ -42,9 +42,7 @@ return [
     'view' => [
         'base_view' => 'master.php',
         'placeholder' => [
-            'header' => '{{header}}',
-            'contents' => '{{contents}}',
-            'footer' => '{{footer}}'
+            'contents' => '{{contents}}'
         ]
     ]
 ];

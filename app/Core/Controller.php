@@ -23,16 +23,8 @@ class Controller
         return $response->withStatus($params['code']);
     }
     
-    public function render(Request $request, Response $response, string $viewPath, array $args, $header = true, $footer = false)
+    public function render(Request $request, Response $response, string $viewPath, array $args)
     {
-        $role = $request->getAttribute('role');
-        $args['role'] = $role;
-        
-        if ($role != "admin") {
-            $args['header'] = $header;
-            $args['footer'] = $footer;
-        }
-        
         $response->getBody()->write(
             (string) $this->view
                 ->createPage($viewPath, $args)
