@@ -5,7 +5,7 @@
     <?= $this->renderLayout('head', $params) ?>
 </head>
 
-<body class="font-sans bg-gray-100 text-gray-800 leading-relaxed m-0 p-0">
+<body class="bg-gray-100 flex items-center justify-center h-screen">
 
     {{contents}}
 
