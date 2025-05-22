@@ -75,27 +75,30 @@ function dump($var)
     }
 }
 
-function get_assets($asset) {
-    // $asset = "resources/css/app.css";
-    $manifestPath = PUBLIC_PATH . '/build/.vite/manifest.json';
-
-    if (strtolower($_ENV['APP_ENV']) == 'dev') {
-        if (!file_exists($manifestPath)) {
-            // Handle case where manifest does not exist (e.g., in development)
-            return 'http://localhost:5173/'.$asset;
+function vite_asset($path) {
+    // If development mode
+    if (str_starts_with($_ENV['APP_ENV'], 'dev')) {
+        // Check if Vite dev server is running inside Docker container on port 5173
+        $devServer = @fsockopen('localhost', 5173);
+        if (!$devServer) {
+            throw new Exception('Dev server is not running. Please run `npm run dev`.');
         }
-        return 'http://localhost:5173/' . $asset;
-    }
+        // Dev mode - point to Vite dev server exposed on Windows host
+        return "http://localhost:5173/" . $path;
+    } else {
+        // Prod mode - point to the built file in the public folder
+        $manifestFile = PUBLIC_PATH . DIRECTORY_SEPARATOR . 'build/.vite/manifest.json';
 
-    if (!file_exists($manifestPath)) {
-        throw new Exception("Production assets not found!");
-    }
+        if (!file_exists($manifestFile)) {
+            throw new Exception('The Vite manifest file does not exist. Please run `npm run build`.');
+        }
 
-    $manifest = json_decode(file_get_contents($manifestPath), true);
-    if (isset($manifest[$asset])) {
-        return '/build/' . $manifest[$asset]['file'];
+        $manifest = json_decode(file_get_contents($manifestFile), true);
+
+        if (isset($manifest[$path])) {
+            return "/build/" . ltrim($manifest[$path]['file'], '/');
+        } else {
+            throw new Exception('The Vite manifest file does not contain the path: ' . $path);
+        }
     }
-    
-    // Handle case where the asset is not found in the manifest
-    return $asset;
 }

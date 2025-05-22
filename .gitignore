@@ -1,5 +1,42 @@
-.env/
-.idea/
+# Environment and config
+.env
+*.local
+
+# PHP specific
+.phpunit.result.cache
+
+# Composer dependencies
 vendor/
+
+# Node dependencies and builds
 node_modules/
+dist/
+dist-ssr
+resources/dist/
 resources/.sass-cache/
+public/build/
+public/js/vendor/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Ignore everything in storage except .gitkeep
+storage/*
+!storage/.gitkeep
+
+# IDE/editor settings
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

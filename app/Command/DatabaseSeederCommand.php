@@ -22,14 +22,10 @@ class DatabaseSeederCommand extends Command
 
     private array $seeders = [
         'app_settings' => AppSettingsSeeder::class,
-        'outpass_rules' => OutpassRulesSeeder::class,
-        'outpass_data' => OutpassDataSeeder::class,
-        'outpass_templates' => OutpassTemplateSeeder::class,
     ];
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly OutpassService $outpassService
     ) {
         parent::__construct(self::$defaultName);
     }

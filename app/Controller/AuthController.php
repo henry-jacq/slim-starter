@@ -32,20 +32,10 @@ class AuthController extends BaseController
     public function landing(Request $request, Response $response): Response
     {
         $args = [
-            'title' => 'Passito - Seamless Gatepass Management System'
+            'title' => 'Landing'
         ];
         return parent::render($request, $response, 'auth/landing', $args);
     }
-
-    // public function authenticate(Request $request, Response $response): Response
-    // {
-    //     $data = $request->getParsedBody();
-    //     $user = $this->auth->authenticate($data['email'], $data['password']);
-    //     if ($user) {
-    //         return $response->withHeader('Location', '/dashboard')->withStatus(302);
-    //     }
-    //     return $response->withHeader('Location', '/login')->withStatus(302);
-    // }
 
     public function logout(Request $request, Response $response): Response
     {
