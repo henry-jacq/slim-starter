@@ -3,10 +3,20 @@
 namespace App\Controller;
 
 use Closure;
-use App\Core\Auth;
 use App\Core\View;
 use App\Core\Session;
+use App\Core\Storage;
+use App\Services\SMSService;
+use App\Services\AuthService;
+use App\Services\MailService;
+use App\Services\UserService;
 use InvalidArgumentException;
+use App\Services\AdminService;
+use App\Services\OutpassService;
+use App\Services\FacilityService;
+use App\Services\VerifierService;
+use App\Services\ParentVerificationService;
+use App\Utils\CsvProcessor;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -15,6 +25,7 @@ class ApiController
     protected $data;
     protected $files;
     protected $params;
+    protected $headers;
     protected $resource;
     protected $namespace;
     protected $attributes;
@@ -31,15 +42,25 @@ class ApiController
     ];
     private const ALLOWED_HEADERS = [
         'Content-Type', 'Content-Length',
-        'Content-Disposition', 'Pragma',
-        'Cache-Control', 'Expires', 'Last-Modified'
+        'Content-Disposition', 'Pragma', 'Host',
+        'Cache-Control', 'Expires', 'Last-Modified', 'Authorization'
     ];
     private const API_ROUTE = ROUTES_PATH . DIRECTORY_SEPARATOR . 'api';
 
     public function __construct(
-        private readonly Auth $auth,
         private readonly View $view,
-        private readonly Session $session
+        private readonly Session $session,
+        private readonly AuthService $auth,
+        private readonly MailService $mail,
+        private readonly SMSService $sms,
+        private readonly Storage $storage,
+        private readonly UserService $userService,
+        private readonly AdminService $adminService,
+        private readonly OutpassService $outpassService,
+        private readonly VerifierService $verifierService,
+        private readonly FacilityService $facilityService,
+        private readonly CsvProcessor $csvProcessor,
+        private readonly ParentVerificationService $verificationService
     )
     {
     }
@@ -54,6 +75,7 @@ class ApiController
         $this->files = $request->getUploadedFiles();
         $this->params = $request->getServerParams();
         $this->attributes = $request->getAttributes();
+        $this->headers = $request->getHeaders();
 
         $get = $this->cleanInputs($request->getQueryParams());
         $post = $this->cleanInputs($request->getParsedBody() ?? []);
@@ -117,7 +139,7 @@ class ApiController
         }
         if ($this->fileExists() !== false) {
             include_once $this->fileExists();
-            $this->current_call = Closure::bind(${$func}, $this, get_class());
+            $this->current_call = Closure::bind(${$func}, $this, get_class($this));
             return $this->$func();
         } else {
             return $this->response([
@@ -137,7 +159,7 @@ class ApiController
             return false;
         }
         foreach ($params as $param) {
-            if (!array_key_exists($param, $this->data)) {
+            if (!array_key_exists($param, $this->data) || empty($this->data[$param])) {
                 $exists = false;
             }
         }
@@ -155,8 +177,12 @@ class ApiController
                 $clean_input[$k] = $this->cleanInputs($v);
             }
         } else {
-            $data = strip_tags($data);
-            $clean_input = trim($data);
+            if (!is_null($data)) {
+                $data = strip_tags((string) $data); // Cast to string, safely removes null
+                $clean_input = trim($data);
+            } else {
+                $clean_input = ''; // or null, based on how you want to handle empty inputs
+            }
         }
         return $clean_input;
     }
@@ -173,9 +199,9 @@ class ApiController
     /**
      * Get redirect URL
      */
-    public function getRedirect()
+    public function getRedirect($default = "/")
     {
-        $redirect = $this->session->get('_redirect', '/home');
+        $redirect = $this->session->get('_redirect', $default);
         $this->session->forget('_redirect');
         return $redirect;
     }
@@ -189,9 +215,17 @@ class ApiController
                 return packJson($data);
             case 'application/zip':
                 $zipFile = $data['zipFile'];
-
                 if (file_exists($zipFile)) {
                     return file_get_contents($zipFile);
+                } else {
+                    return packJson(['error' => 'File not found'], 'application/json');
+                }
+            case 'text/csv':
+                $csvFile = $data['csvFile'];
+                if (file_exists($csvFile)) {
+                    $fileContents = file_get_contents($csvFile);
+                    unlink($csvFile);
+                    return $fileContents;
                 } else {
                     return packJson(['error' => 'File not found'], 'application/json');
                 }
@@ -200,6 +234,7 @@ class ApiController
         }
     }
 
+    // Not used
     private function negotiateContentType(array $acceptedContentTypes): string
     {
         foreach (self::ALLOWED_CONTENT_TYPES as $allowedContentType) {
@@ -211,7 +246,7 @@ class ApiController
         throw new InvalidArgumentException('Unsupported Content Type');
     }
 
-    private function negotiateHeaders(array $requestHeaders): array
+    public function negotiateHeaders(array $requestHeaders): array
     {
         $negotiatedHeaders = [];
         foreach ($requestHeaders as $header => $values) {
@@ -281,12 +316,19 @@ class ApiController
     }
 
     /**
-     * Check if user is admin or not
+     * Get user role
+     */
+    public function getRole(): string
+    {
+        return $this->session->get('role');
+    }
+
+    /**
+     * Check if user is admin
      */
     public function isAdmin(): bool
     {
-        $role = $this->getAttribute('role');
-        return $role === 'admin';
+        return $this->auth->isAdmin();
     }
 
     /**

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Core;
 
 use RuntimeException;
-use App\Interfaces\SessionInterface;
 
-class Session implements SessionInterface
+class Session
 {
     public array $options;
     
@@ -26,13 +25,13 @@ class Session implements SessionInterface
             throw new RuntimeException('Headers have already sent by ' . $fileName . ':' . $line);
         }
 
-        // session_set_cookie_params(
-        //     [
-        //         'secure'   => $this->options['secure'],
-        //         'httponly' => $this->options['httponly'],
-        //         'samesite' => $this->options['samesite'],
-        //     ]
-        // );
+        session_set_cookie_params(
+            [
+                'secure'   => $this->options['secure'],
+                'httponly' => $this->options['httponly'],
+                'samesite' => $this->options['samesite'],
+            ]
+        );
 
         if (!empty($this->options['name'])) {
             session_name($this->options['name']);
@@ -41,6 +40,11 @@ class Session implements SessionInterface
         if (!session_start()) {
             throw new RuntimeException('Unable to start the session');
         }
+    }
+
+    public function getSessionID(): string
+    {
+        return session_id();
     }
 
     public function save(): void
@@ -76,6 +80,14 @@ class Session implements SessionInterface
     public function forget(string $key): void
     {
         unset($_SESSION[$key]);
+    }
+
+    public function destroy(): void
+    {
+        if ($this->isActive()) {
+            session_unset();
+            session_destroy();
+        }
     }
 
     public function flash(string $key, array $messages): void
