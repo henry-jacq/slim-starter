@@ -6,7 +6,6 @@ use App\Core\View;
 use App\Entity\User;
 use App\Core\Request;
 use App\Core\Session;
-use App\Entity\Student;
 use App\Enum\UserRole;
 use Psr\Http\Message\ResponseInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,8 +53,8 @@ class UserMiddleware implements MiddlewareInterface
 
             $userRole = $student->getUser()->getRole()->value;
 
-            // Prevent unauthorized users from accessing student routes
-            if (!UserRole::isStudent($userRole)) {
+            // Prevent unauthenticated ones from accessing user routes
+            if (!UserRole::isUser($userRole)) {
                 return $this->responseFactory
                     ->createResponse(302)
                     ->withHeader('Location', $this->view->urlFor('auth.login'));
@@ -69,7 +68,7 @@ class UserMiddleware implements MiddlewareInterface
             }
 
             // Set the user data and role in the request
-            $request = $request->withAttribute('student', $student);
+            $request = $request->withAttribute('user', $student);
         }
 
         return $handler->handle($request);
