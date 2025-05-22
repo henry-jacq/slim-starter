@@ -26,7 +26,7 @@ class AuthMiddleware implements MiddlewareInterface
         if (!empty($this->session->get('user'))) {
 
             $role = $this->session->get('role');
-            $location = $this->view->urlFor('student.dashboard');
+            $location = $this->view->urlFor('user.dashboard');
             
             if (UserRole::isAdministrator($role)) {
                 $location = $this->view->urlFor('admin.dashboard');

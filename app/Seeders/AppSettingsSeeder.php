@@ -6,21 +6,19 @@ use DateTime;
 use App\Entity\Settings;
 use Doctrine\ORM\EntityManagerInterface;
 
-class AppSettingsSeeder
+class AppSettingsSeeder implements SeederInterface
 {
     public function __construct(private readonly EntityManagerInterface $em)
     {
     }
 
-    public function run()
+    public function run(): void
     {
         $settings = [
+            ['keyName' => 'app_name', 'value' => 'Quark PHP'],
             ['keyName' => 'setup_complete', 'value' => 'true'],
             ['keyName' => 'maintenance_mode', 'value' => 'false'],
-            ['keyName' => 'admin_created', 'value' => 'false'],
-            ['keyName' => 'app_name', 'value' => 'Passito'],
             ['keyName' => 'email_settings', 'value' => '{}'],
-            ['keyName' => 'max_outpasses_per_day', 'value' => '2'],
         ];
 
         foreach ($settings as $setting) {

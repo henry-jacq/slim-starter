@@ -3,11 +3,10 @@
 namespace App\Enum;
 
 enum UserRole: string {
-    case USER = 'student';
-    case ADMIN = 'warden';
-    case SUPER_ADMIN = 'chief_warden';
+    case USER = 'user';
+    case ADMIN = 'admin';
 
-    public static function isStudent(string $role): bool {
+    public static function isUser(string $role): bool {
         return self::tryFrom($role) === self::USER;
     }
 
@@ -15,15 +14,11 @@ enum UserRole: string {
         return self::tryFrom($role) === self::ADMIN;
     }
 
-    public static function isSuperAdmin(string $role): bool {
-        return self::tryFrom($role) === self::SUPER_ADMIN;
-    }
-
     public static function isAdministrator(string $role): bool {
-        return in_array($role, [self::ADMIN->value, self::SUPER_ADMIN->value]);
+        return in_array($role, [self::ADMIN->value]);
     }
 
     public static function isValidRole(string $role): bool {
-        return in_array($role, [self::USER->value, self::ADMIN->value, self::SUPER_ADMIN->value]);
+        return in_array($role, [self::USER->value, self::ADMIN->value]);
     }
 }

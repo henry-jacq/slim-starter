@@ -40,7 +40,7 @@ class UserMiddleware implements MiddlewareInterface
         } else { 
             // User is authenticated
             // Get the student entity
-            $student = $this->em->getRepository(Student::class)->findOneBy(
+            $student = $this->em->getRepository(User::class)->findOneBy(
                 ['user' => $this->session->get('user')]
             );
 
