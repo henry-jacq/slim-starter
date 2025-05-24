@@ -4,6 +4,7 @@ namespace App\Seeders;
 
 use DateTime;
 use App\Entity\Settings;
+use App\Interfaces\SeederInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class AppSettingsSeeder implements SeederInterface

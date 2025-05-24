@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Seeders;
+namespace App\Interfaces;
 
 interface SeederInterface
 {
